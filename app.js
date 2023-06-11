@@ -31,6 +31,32 @@ process.on('unhandledRejection', (reason, promise) => {
     process.exit(1); // Exit the process with a failure status
   });
 });
+// GRACEFUL SHUTDOWN 
+
+// shutdown logic 
+const shutdown = (signal, value) => {
+  console.log("shutdown!");
+  server.close(() => {
+    console.log(`server stopped by ${signal} with value ${value}`);
+    process.exit(128 + value);
+  });
+};
+
+// SIGHUP
+process.on('SIGHUP', () => {
+  console.log(`process received a SIGHUP signal`);
+  shutdown('SIGHUP', 1);
+});
+// SIGINT
+process.on('SIGINT', () => {
+  console.log(`process received a SIGINT signal`);
+  shutdown('SIGINT', 2);
+});
+// SIGTERM
+process.on('SIGTERM', () => {
+  console.log(`process received a SIGTERM signal`);
+  shutdown('SIGTERM', 15);
+});
 
 // Handle termination signals gracefully
 // process.on('SIGINT', () => {
